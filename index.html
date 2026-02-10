@@ -4,160 +4,630 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Приложение для создания и прохождения тестов">
     <title>Тест Приложение</title>
+    
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3407/3407024.png">
+    
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3407/3407024.png" type="image/png">
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
-        :root { --primary: #667eea; --secondary: #764ba2; --bg: #f8f9fa; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); min-height: 100vh; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { text-align: center; color: white; margin-bottom: 30px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 15px; background: rgba(255, 255, 255, 0.2); border: none; color: white; font-weight: 600; cursor: pointer; border-radius: 12px; transition: 0.3s; backdrop-filter: blur(10px); }
-        .tab.active { background: white; color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .view { display: none; }
-        .view.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; }
-        input, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); }
-        .btn { padding: 12px 20px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; width: 100%; margin-top: 10px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn-danger { background: #ff4757; color: white; width: auto; padding: 8px 15px; }
-        .q-item { background: var(--bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
-        .opt-row { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-        .test-opt { padding: 15px; background: var(--bg); border: 2px solid #eee; border-radius: 12px; margin: 10px 0; cursor: pointer; transition: 0.2s; }
-        .test-opt:hover { border-color: var(--primary); }
-        .test-opt.selected { background: var(--primary); color: white; border-color: var(--primary); }
-        .progress { height: 8px; background: #eee; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
-        .score { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 20px 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.35);
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .option-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .option-input input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .question-list {
+            margin-top: 30px;
+        }
+
+        .question-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+        }
+
+        .question-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .question-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .question-item .options {
+            margin: 10px 0;
+        }
+
+        .question-item .option {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-left: 3px solid #28a745;
+        }
+
+        .question-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .test-question {
+            margin-bottom: 30px;
+        }
+
+        .test-question h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .test-option {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(6px);
+        }
+
+        .test-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .test-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .grade-display {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .grade-2 { color: #ff4757; }
+        .grade-3 { color: #ffa502; }
+        .grade-4 { color: #1e90ff; }
+        .grade-5 { color: #2ed573; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><h1>📝 Testing App</h1><p>Версия с исправленной иконкой</p></div>
+        <div class="header">
+            <h1>📝 Тест Приложение</h1>
+            <p>Создавайте тесты и проверяйте знания</p>
+        </div>
+
         <div class="tabs">
-            <button class="tab active" onclick="tab('create', this)">Создать</button>
-            <button class="tab" onclick="tab('list', this)">Мои тесты</button>
-            <button class="tab" onclick="tab('take', this)">Пройти</button>
+            <button class="tab active" onclick="switchTab('create', this)">Создать тест</button>
+            <button class="tab" onclick="switchTab('list', this)">Мои тесты</button>
+            <button class="tab" onclick="switchTab('take', this)">Пройти тест</button>
         </div>
 
         <div class="card">
             <div id="create" class="view active">
-                <div class="form-group"><label>Название</label><input type="text" id="tTitle"></div>
-                <div class="form-group"><label>Описание</label><textarea id="tDesc"></textarea></div>
-                <hr><br>
-                <div class="form-group"><label>Вопрос</label><input type="text" id="qText"></div>
-                <div id="opts">
-                    <div class="opt-row"><input type="text" class="o-val" placeholder="Вариант 1"> <input type="radio" name="c" value="0"></div>
-                    <div class="opt-row"><input type="text" class="o-val" placeholder="Вариант 2"> <input type="radio" name="c" value="1"></div>
+                <h2 style="margin-bottom: 20px;">Создать / Редактировать тест</h2>
+                
+                <div class="form-group">
+                    <label>Название теста</label>
+                    <input type="text" id="testTitle" placeholder="Введите название теста">
                 </div>
-                <button class="btn btn-primary" onclick="addQ()" style="background:#6c757d">➕ Добавить вопрос</button>
-                <div id="addedQs" style="margin-top:20px"></div>
-                <button class="btn btn-primary" onclick="saveT()">💾 Сохранить весь тест</button>
+
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="testDescription" placeholder="Краткое описание теста"></textarea>
+                </div>
+
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+
+                <h3 style="margin-bottom: 20px;">Добавить вопрос</h3>
+
+                <div class="form-group">
+                    <label>Вопрос</label>
+                    <input type="text" id="questionText" placeholder="Введите текст вопроса">
+                </div>
+
+                <div class="form-group">
+                    <label>Варианты ответов</label>
+                    <div id="optionsContainer">
+                        <div class="option-input">
+                            <input type="text" placeholder="Вариант 1" data-option="0">
+                            <label style="display: flex; align-items: center; gap: 5px; margin: 0;">
+                                <input type="radio" name="correctOption" value="0"> Правильный
+                            </label>
+                        </div>
+                        <div class="option-input">
+                            <input type="text" placeholder="Вариант 2" data-option="1">
+                            <label style="display: flex; align-items: center; gap: 5px; margin: 0;">
+                                <input type="radio" name="correctOption" value="1"> Правильный
+                            </label>
+                        </div>
+                        <div class="option-input">
+                            <input type="text" placeholder="Вариант 3" data-option="2">
+                            <label style="display: flex; align-items: center; gap: 5px; margin: 0;">
+                                <input type="radio" name="correctOption" value="2"> Правильный
+                            </label>
+                        </div>
+                        <div class="option-input">
+                            <input type="text" placeholder="Вариант 4" data-option="3">
+                            <label style="display: flex; align-items: center; gap: 5px; margin: 0;">
+                                <input type="radio" name="correctOption" value="3"> Правильный
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="addQuestion()">➕ Добавить вопрос</button>
+                    <button class="btn btn-secondary" onclick="clearQuestionForm()">Очистить форму вопроса</button>
+                </div>
+
+                <div id="currentQuestions" class="question-list"></div>
+
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0;">
+                    <button id="saveUpdateBtn" class="btn btn-primary" onclick="saveTest()" style="width: 100%;">
+                        💾 Сохранить тест
+                    </button>
+                </div>
             </div>
 
             <div id="list" class="view">
-                <h2>Ваши тесты</h2><br>
-                <div id="lCont"></div>
+                <h2 style="margin-bottom: 20px;">Мои тесты</h2>
+                <div id="testList"></div>
             </div>
 
             <div id="take" class="view">
-                <div id="sMode"><h2>Выберите тест</h2><br><div id="availT"></div></div>
-                <div id="qMode" style="display:none">
-                    <div class="progress"><div class="progress-bar" id="pBar"></div></div>
-                    <div id="qCont"></div>
-                    <button class="btn btn-primary" onclick="endQ()">Завершить</button>
+                <div id="testSelection">
+                    <h2 style="margin-bottom: 20px;">Выберите тест</h2>
+                    <div id="availableTests"></div>
                 </div>
-                <div id="rMode" style="display:none; text-align:center">
-                    <h2>Результат:</h2><div class="score" id="fScore"></div>
-                    <button class="btn btn-primary" onclick="location.reload()">В меню</button>
+
+                <div id="testTaking" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="testContent"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 30px;">
+                        <button class="btn btn-secondary" onclick="backToTestSelection()">Назад</button>
+                        <button class="btn btn-primary" onclick="submitTest()" style="flex: 1;">
+                            ✓ Завершить тест
+                        </button>
+                    </div>
+                </div>
+
+                <div id="testResults" style="display: none;">
+                    <div class="results">
+                        <h2>Результаты теста</h2>
+                        <div id="scoreDisplay" class="score-display"></div>
+                        <div id="gradeDisplay" class="grade-display"></div>
+                        <p id="resultMessage" style="font-size: 1.2rem; color: #666; margin-bottom: 30px;"></p>
+                        <button class="btn btn-primary" onclick="backToTestSelection()">
+                            Вернуться к выбору теста
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('tests') || '[]');
-        let curT = { questions: [] };
-        let active = null; let ans = [];
+        let currentTest = {
+            title: '',
+            description: '',
+            questions: []
+        };
 
-        function tab(id, b) {
-            document.querySelectorAll('.tab, .view').forEach(x => x.classList.remove('active'));
-            b.classList.add('active'); document.getElementById(id).classList.add('active');
-            if(id === 'list') drawL(); if(id === 'take') drawA();
+        let tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        let currentTestIndex = -1; 
+        let userAnswers = [];
+
+        function switchTab(tab, button) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            
+            button.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+
+            if (tab === 'list') {
+                displayTestList();
+            } else if (tab === 'take') {
+                displayAvailableTests();
+                document.getElementById('testSelection').style.display = 'block';
+                document.getElementById('testTaking').style.display = 'none';
+                document.getElementById('testResults').style.display = 'none';
+            }
         }
 
-        function addQ() {
-            let t = document.getElementById('qText').value;
-            let ov = Array.from(document.querySelectorAll('.o-val')).map(x => x.value).filter(x => x);
-            let c = document.querySelector('input[name="c"]:checked')?.value;
-            if(!t || ov.length < 2 || !c) return alert("Заполните всё!");
-            curT.questions.push({t, ov, c: parseInt(c)});
-            document.getElementById('qText').value = '';
-            document.getElementById('addedQs').innerHTML += `<div class='q-item'>${t} (вариантов: ${ov.length})</div>`;
+        function addQuestion() {
+            const questionText = document.getElementById('questionText').value.trim();
+            const optionInputs = document.querySelectorAll('#optionsContainer input[type="text"]');
+            const correctOption = document.querySelector('input[name="correctOption"]:checked');
+
+            if (!questionText) return alert('Введите текст вопроса');
+            const options = Array.from(optionInputs).map(i => i.value.trim()).filter(v => v);
+            if (options.length < 2) return alert('Минимум 2 варианта ответа');
+            if (!correctOption) return alert('Выберите правильный ответ');
+
+            const question = {
+                text: questionText,
+                options,
+                correctAnswer: parseInt(correctOption.value)
+            };
+
+            currentTest.questions.push(question);
+            displayCurrentQuestions();
+            clearQuestionForm();
+
+            const newItem = document.querySelector('.question-item:last-child');
+            if (newItem) {
+                setTimeout(() => newItem.classList.add('visible'), 50);
+            }
         }
 
-        function saveT() {
-            curT.title = document.getElementById('tTitle').value;
-            if(!curT.title || !curT.questions.length) return alert("Нужно название и вопросы!");
-            db.push({...curT}); localStorage.setItem('tests', JSON.stringify(db));
-            confetti(); alert("Готово!"); location.reload();
+        function clearQuestionForm() {
+            document.getElementById('questionText').value = '';
+            document.querySelectorAll('#optionsContainer input[type="text"]').forEach(i => i.value = '');
+            document.querySelectorAll('input[name="correctOption"]').forEach(r => r.checked = false);
         }
 
-        function drawL() {
-            document.getElementById('lCont').innerHTML = db.map((x, i) => `
-                <div class="q-item"><h3>${x.title}</h3><p>Вопросов: ${x.questions.length}</p>
-                <button class="btn btn-danger" onclick="del(${i})">Удалить</button></div>
-            `).join('') || "Пока пусто";
-        }
-
-        function del(i) { if(confirm("Удалить?")) { db.splice(i,1); localStorage.setItem('tests', JSON.stringify(db)); drawL(); } }
-
-        function drawA() {
-            document.getElementById('availT').innerHTML = db.map((x, i) => `
-                <div class="q-item" onclick="start(${i})" style="cursor:pointer"><h3>${x.title} →</h3></div>
-            `).join('') || "Создайте тест";
-        }
-
-        function start(i) {
-            active = db[i]; ans = new Array(active.questions.length).fill(null);
-            document.getElementById('sMode').style.display='none';
-            document.getElementById('qMode').style.display='block';
-            showQ();
-        }
-
-        function showQ() {
-            let h = `<h2>${active.title}</h2><br>`;
-            active.questions.forEach((q, i) => {
-                h += `<div style="margin-bottom:20px"><b>${i+1}. ${q.t}</b>`;
-                q.ov.forEach((o, oi) => h += `<div class="test-opt" onclick="sel(${i},${oi},this)">${o}</div>`);
-                h += `</div>`;
+        function displayCurrentQuestions() {
+            const container = document.getElementById('currentQuestions');
+            container.innerHTML = '';
+            if (currentTest.questions.length === 0) return;
+            container.innerHTML = '<h3 style="margin: 30px 0 15px;">Вопросы в тесте:</h3>';
+            currentTest.questions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-item visible';
+                div.innerHTML = `
+                    <h3>${index + 1}. ${q.text}</h3>
+                    <div class="options">
+                        ${q.options.map((opt, i) => `
+                            <div class="option ${i === q.correctAnswer ? 'correct' : ''}">
+                                ${i === q.correctAnswer ? '✓' : '○'} ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="question-controls">
+                        <button class="btn btn-danger" onclick="deleteQuestion(${index})">🗑 Удалить</button>
+                    </div>
+                `;
+                container.appendChild(div);
             });
-            document.getElementById('qCont').innerHTML = h;
         }
 
-        function sel(qi, oi, e) {
-            ans[qi] = oi; e.parentElement.querySelectorAll('.test-opt').forEach(x => x.classList.remove('selected'));
-            e.classList.add('selected');
-            document.getElementById('pBar').style.width = (ans.filter(x => x !== null).length / ans.length * 100) + '%';
+        function deleteQuestion(index) {
+            if (!confirm('Удалить вопрос?')) return;
+            currentTest.questions.splice(index, 1);
+            displayCurrentQuestions();
         }
 
-        function endQ() {
-            let s = 0; active.questions.forEach((q, i) => { if(ans[i] === q.c) s++; });
-            document.getElementById('qMode').style.display='none';
-            document.getElementById('rMode').style.display='block';
-            document.getElementById('fScore').innerText = `${s} / ${active.questions.length}`;
-            if(s === active.questions.length) confetti();
+        function saveTest() {
+            const title = document.getElementById('testTitle').value.trim();
+            const description = document.getElementById('testDescription').value.trim();
+            if (!title) return alert('Введите название теста');
+            if (currentTest.questions.length === 0) return alert('Добавьте хотя бы один вопрос');
+            currentTest.title = title;
+            currentTest.description = description;
+            tests.push({ ...currentTest });
+            localStorage.setItem('tests', JSON.stringify(tests));
+            alert('Тест успешно сохранён!');
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            resetForm();
+            switchTab('list', document.querySelector('.tab[onclick*="list"]'));
         }
 
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+        function resetForm() {
+            currentTest = { title: '', description: '', questions: [] };
+            document.getElementById('testTitle').value = '';
+            document.getElementById('testDescription').value = '';
+            displayCurrentQuestions();
+        }
+
+        function displayTestList() {
+            const container = document.getElementById('testList');
+            if (tests.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>У вас пока нет тестов</p></div>';
+                return;
+            }
+            container.innerHTML = tests.map((test, index) => `
+                <div class="question-item visible">
+                    <h3>${test.title}</h3>
+                    <p>${test.description || 'Без описания'}</p>
+                    <button class="btn btn-danger" onclick="deleteTest(${index})">🗑 Удалить</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteTest(index) {
+            if (!confirm('Удалить этот тест?')) return;
+            tests.splice(index, 1);
+            localStorage.setItem('tests', JSON.stringify(tests));
+            displayTestList();
+        }
+
+        function displayAvailableTests() {
+            const container = document.getElementById('availableTests');
+            if (tests.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Нет доступных тестов</p></div>';
+                return;
+            }
+            container.innerHTML = tests.map((test, index) => `
+                <div class="question-item" style="cursor: pointer; opacity:1; transform:none;" onclick="startTest(${index})">
+                    <h3>${test.title}</h3>
+                    <button class="btn btn-primary" style="margin-top: 10px;">Начать тест →</button>
+                </div>
+            `).join('');
+        }
+
+        function startTest(index) {
+            currentTestIndex = index;
+            userAnswers = new Array(tests[index].questions.length).fill(-1);
+            document.getElementById('testSelection').style.display = 'none';
+            document.getElementById('testTaking').style.display = 'block';
+            displayTestQuestions();
+        }
+
+        function displayTestQuestions() {
+            const test = tests[currentTestIndex];
+            const container = document.getElementById('testContent');
+            container.innerHTML = `<h2>${test.title}</h2>${test.questions.map((q, qIndex) => `
+                <div class="test-question">
+                    <p><b>Вопрос ${qIndex + 1}:</b> ${q.text}</p>
+                    ${q.options.map((opt, oIndex) => `
+                        <label class="test-option ${userAnswers[qIndex] === oIndex ? 'selected' : ''}" onclick="userAnswers[${qIndex}]=${oIndex}; displayTestQuestions();">
+                            <input type="radio" name="q${qIndex}" ${userAnswers[qIndex] === oIndex ? 'checked' : ''}> ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+            `).join('')}`;
+            const answered = userAnswers.filter(a => a !== -1).length;
+            document.getElementById('progressFill').style.width = (answered / userAnswers.length * 100) + '%';
+        }
+
+        function submitTest() {
+            const test = tests[currentTestIndex];
+            let correct = 0;
+            test.questions.forEach((q, i) => { if(userAnswers[i] === q.correctAnswer) correct++; });
+            const percent = (correct / test.questions.length) * 100;
+            document.getElementById('testTaking').style.display = 'none';
+            document.getElementById('testResults').style.display = 'block';
+            document.getElementById('scoreDisplay').innerText = `${correct} / ${test.questions.length}`;
+            if(percent >= 80) confetti();
+        }
+
+        function backToTestSelection() {
+            document.getElementById('testSelection').style.display = 'block';
+            document.getElementById('testTaking').style.display = 'none';
+            document.getElementById('testResults').style.display = 'none';
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
     </script>
 </body>
 </html>
