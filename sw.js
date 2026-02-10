@@ -1,13 +1,17 @@
-const CACHE_NAME = 'test-app-v1';
+const CACHE_NAME = 'test-app-v2';
 const ASSETS = [
-  'Excam.html',
-  'manifest.json'
+  './index.html',
+  './manifest.json'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS))
+  );
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+  e.respondWith(
+    caches.match(e.request).then(res => res || fetch(e.request))
+  );
 });
