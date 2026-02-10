@@ -2,7 +2,7 @@
   "name": "Тест Приложение",
   "short_name": "Тесты",
   "description": "Приложение для создания тестов",
-  "start_url": "Excam.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
